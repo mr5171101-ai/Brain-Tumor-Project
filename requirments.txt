@@ -1,8 +1,0 @@
-streamlit
-ultralytics
-pillow
-torch
-torchvision
-fastapi
-request
-io
