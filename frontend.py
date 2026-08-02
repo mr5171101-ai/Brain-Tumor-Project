@@ -1,10 +1,20 @@
 import streamlit as st
-import requests
+from ultralytics import YOLO
 from PIL import Image, ImageDraw
 import io
 
 st.set_page_config(page_title="Brain Tumor Detection")
 st.title("🧠 Brain Tumor Detection")
+
+# Cache model so it loads only once
+@st.cache_resource
+def load_model():
+    return YOLO("models/best.pt")
+
+try:
+    model = load_model()
+except Exception as e:
+    st.error(f"Model load karne me issue aaya. Path check karein: {e}")
 
 uploaded_file = st.file_uploader("MRI Image Upload Karein", type=["jpg", "jpeg", "png"])
 
@@ -14,28 +24,25 @@ if uploaded_file is not None:
     
     if st.button("Detect Tumor"):
         with st.spinner("Processing..."):
-            img_byte_arr = io.BytesIO()
-            image.save(img_byte_arr, format='JPEG')
-            img_bytes = img_byte_arr.getvalue()
+            # Direct YOLO prediction without FastAPI
+            results = model.predict(image, conf=0.25)
             
-            # Send request to FastAPI backend
-            response = requests.post(
-                "http://127.0.0.1:8000/predict/",
-                files={"file": ("image.jpg", img_bytes, "image/jpeg")}
-            )
+            # Process detections
+            detections = []
+            for r in results:
+                for box in r.boxes:
+                    detections.append({
+                        "bbox": box.xyxy[0].tolist(),
+                        "confidence": float(box.conf[0])
+                    })
             
-            if response.status_code == 200:
-                data = response.json()
-                detections = data.get("detections", [])
-                
-                draw = ImageDraw.Draw(image)
-                for det in detections:
-                    box = det["bbox"]
-                    conf = det["confidence"]
-                    draw.rectangle(box, outline="red", width=3)
-                    draw.text((box[0], box[1] - 10), f"Tumor: {conf:.2f}", fill="red")
-                
-                st.image(image, caption="Detection Result", use_column_width=True)
-                st.success(f"Total Detections: {len(detections)}")
-            else:
-                st.error("Backend response me error aaya.")
+            # Draw boxes
+            draw = ImageDraw.Draw(image)
+            for det in detections:
+                box = det["bbox"]
+                conf = det["confidence"]
+                draw.rectangle(box, outline="red", width=3)
+                draw.text((box[0], box[1] - 10), f"Tumor: {conf:.2f}", fill="red")
+            
+            st.image(image, caption="Detection Result", use_column_width=True)
+            st.success(f"Total Detections: {len(detections)}")
