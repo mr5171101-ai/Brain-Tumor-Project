@@ -1,0 +1,7 @@
+streamlit
+ultralytics
+pillow
+torch
+torchvision
+fastapi
+requests
