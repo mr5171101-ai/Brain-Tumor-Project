@@ -2,6 +2,7 @@ streamlit
 ultralytics
 pillow
 torch
+opencv-python-headless
 torchvision
 fastapi
 requests
