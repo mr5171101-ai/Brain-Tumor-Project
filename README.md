@@ -1,2 +1,2 @@
 Here is Deploye link:
-https://brain-tumor-project-jveiikhre3nsulgzzyzdh8.streamlit.app/
+https://brain-tumor-project-kcaf4wvcjcnqpvmgeors8k.streamlit.app/
