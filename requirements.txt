@@ -6,3 +6,5 @@ opencv-python-headless
 torchvision
 fastapi
 requests
+libgl1
+libglib2.0-0
