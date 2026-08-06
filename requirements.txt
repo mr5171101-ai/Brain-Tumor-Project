@@ -1,0 +1,11 @@
+streamlit
+ultralytics
+pillow
+torch
+opencv-python-headless
+torchvision
+fastapi
+requests
+libgl1
+libglib2.0-0
+opencv-python-headless
